@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_9de4d209b87fb1e0dcb8ad6390fcfa65 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_9de4d209b87fb1e0dcb8ad6390fcfa65" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_9de4d209b87fb1e0dcb8ad6390fcfa65 = L.map(
+                "map_9de4d209b87fb1e0dcb8ad6390fcfa65",
+                {
+                    center: [55.7558, 37.6176],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 10,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_e036f412c0816f2ba6a536e4efcb2d79 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_e036f412c0816f2ba6a536e4efcb2d79.addTo(map_9de4d209b87fb1e0dcb8ad6390fcfa65);
+        
+    
+            var marker_e7d78329de62dbbf30dad4febb253fea = L.marker(
+                [55.7522, 37.6156],
+                {
+}
+            ).addTo(map_9de4d209b87fb1e0dcb8ad6390fcfa65);
+        
+    
+            var icon_6e326f4709338d70390d672eecaf0af2 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_5d28a1d423c425538a4ac43967569dc0 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_b1c564c2d1dd19033947401562938940 = $(`<div id="html_b1c564c2d1dd19033947401562938940" style="width: 100.0%; height: 100.0%;">Московский Кремль</div>`)[0];
+                popup_5d28a1d423c425538a4ac43967569dc0.setContent(html_b1c564c2d1dd19033947401562938940);
+            
+        
+
+        marker_e7d78329de62dbbf30dad4febb253fea.bindPopup(popup_5d28a1d423c425538a4ac43967569dc0)
+        ;
+
+        
+    
+    
+                marker_e7d78329de62dbbf30dad4febb253fea.setIcon(icon_6e326f4709338d70390d672eecaf0af2);
+            
+    
+            var marker_51ef5afd1a932ffe0a4e310be1a041ec = L.marker(
+                [55.7539, 37.6214],
+                {
+}
+            ).addTo(map_9de4d209b87fb1e0dcb8ad6390fcfa65);
+        
+    
+            var icon_3df9a2a5e3457efe2628bb7ae1d8d583 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_8c49637d2ab1d8f867541a778df5a883 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_74cd7ccead99107558cf8085f9e4ec4c = $(`<div id="html_74cd7ccead99107558cf8085f9e4ec4c" style="width: 100.0%; height: 100.0%;">Александровский сад</div>`)[0];
+                popup_8c49637d2ab1d8f867541a778df5a883.setContent(html_74cd7ccead99107558cf8085f9e4ec4c);
+            
+        
+
+        marker_51ef5afd1a932ffe0a4e310be1a041ec.bindPopup(popup_8c49637d2ab1d8f867541a778df5a883)
+        ;
+
+        
+    
+    
+                marker_51ef5afd1a932ffe0a4e310be1a041ec.setIcon(icon_3df9a2a5e3457efe2628bb7ae1d8d583);
+            
+    
+            var marker_292f0ea9480391fd19c0f63028bc697a = L.marker(
+                [55.7558, 37.6176],
+                {
+}
+            ).addTo(map_9de4d209b87fb1e0dcb8ad6390fcfa65);
+        
+    
+            var icon_95db43f1cd2cbda57eed2dad15500f20 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_257800e1ee5222022160150a4ac45b48 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_3cdb6c2d94712a6d3e2a3ee458b01c31 = $(`<div id="html_3cdb6c2d94712a6d3e2a3ee458b01c31" style="width: 100.0%; height: 100.0%;">Красная площадь</div>`)[0];
+                popup_257800e1ee5222022160150a4ac45b48.setContent(html_3cdb6c2d94712a6d3e2a3ee458b01c31);
+            
+        
+
+        marker_292f0ea9480391fd19c0f63028bc697a.bindPopup(popup_257800e1ee5222022160150a4ac45b48)
+        ;
+
+        
+    
+    
+                marker_292f0ea9480391fd19c0f63028bc697a.setIcon(icon_95db43f1cd2cbda57eed2dad15500f20);
+            
+    
+            var marker_b2374f58ff95da90b8d55ca4f2ce0232 = L.marker(
+                [55.7587, 37.6194],
+                {
+}
+            ).addTo(map_9de4d209b87fb1e0dcb8ad6390fcfa65);
+        
+    
+            var icon_061254f0d3b0950653d7c212c8b06fad = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_9b48abea8f060e2a700ed2811c3ea599 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_b6576ef8d16aeb51be8eb1c79b795d99 = $(`<div id="html_b6576ef8d16aeb51be8eb1c79b795d99" style="width: 100.0%; height: 100.0%;">ГУМ</div>`)[0];
+                popup_9b48abea8f060e2a700ed2811c3ea599.setContent(html_b6576ef8d16aeb51be8eb1c79b795d99);
+            
+        
+
+        marker_b2374f58ff95da90b8d55ca4f2ce0232.bindPopup(popup_9b48abea8f060e2a700ed2811c3ea599)
+        ;
+
+        
+    
+    
+                marker_b2374f58ff95da90b8d55ca4f2ce0232.setIcon(icon_061254f0d3b0950653d7c212c8b06fad);
+            
+    
+            var marker_046c8478c941491a901d8fe81e63ae48 = L.marker(
+                [55.761, 37.6179],
+                {
+}
+            ).addTo(map_9de4d209b87fb1e0dcb8ad6390fcfa65);
+        
+    
+            var icon_ccc7c36388cec05cca3a41ce17f60aa1 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_4ab699a4f033ef1b1493e9a7cdd67e7b = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_4524290995e74a9ddf85e764cf812c65 = $(`<div id="html_4524290995e74a9ddf85e764cf812c65" style="width: 100.0%; height: 100.0%;">Собор Василия Блаженного</div>`)[0];
+                popup_4ab699a4f033ef1b1493e9a7cdd67e7b.setContent(html_4524290995e74a9ddf85e764cf812c65);
+            
+        
+
+        marker_046c8478c941491a901d8fe81e63ae48.bindPopup(popup_4ab699a4f033ef1b1493e9a7cdd67e7b)
+        ;
+
+        
+    
+    
+                marker_046c8478c941491a901d8fe81e63ae48.setIcon(icon_ccc7c36388cec05cca3a41ce17f60aa1);
+            
+    
+            var rectangle_dce1ec1aba6b9ab596fedb78da0da443 = L.rectangle(
+                [[55.306139197040636, 36.81851732264093], [56.205460802959365, 38.41668267735908]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(map_9de4d209b87fb1e0dcb8ad6390fcfa65);
+        
+</script>
+</html>

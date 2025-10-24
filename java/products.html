@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Продукты</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        input[type="text"], input[type="number"] {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .auth-info {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .nav-links {
+            margin-bottom: 20px;
+        }
+
+        .nav-links a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #007BFF;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="nav-links">
+        <a th:href="@{/products}">Главная</a>
+        <a th:href="@{/products/admin}">Админ-панель</a>
+        <span th:if="${currentUser}">
+            Вы вошли как: <strong th:text="${currentUser.username}"></strong> (<span th:text="${currentUser.role}"></span>)
+            <a th:href="@{/products/logout}">Выйти</a>
+        </span>
+        <span th:unless="${currentUser}">
+            <a th:href="@{/products/login}" style="color: purple;">Войти</a>
+        </span>
+    </div>
+
+    <h2>Список продуктов</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Цена</th>
+            <th th:if="${currentUser != null and currentUser.role == 'USER'}">Действия</th>
+        </tr>
+        <tr th:each="product : ${products}">
+            <td th:text="${product.id}"></td>
+            <td th:text="${product.name}"></td>
+            <td th:text="${product.price}"></td>
+            <td th:if="${currentUser != null and currentUser.role == 'USER'}">
+                <form th:action="@{/products/delete/{id}(id=${product.id})}" method="post">
+                    <button type="submit">Удалить</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Добавить продукт</h2>
+    <form th:action="@{/products}" th:object="${product}" method="post">
+        <div class="form-group">
+            <label>Название:</label>
+            <input type="text" th:field="*{name}" required>
+        </div>
+        <div class="form-group">
+            <label>Цена:</label>
+            <input type="number" th:field="*{price}" required>
+        </div>
+        <button type="submit">Добавить</button>
+    </form>
+</div>
+</body>
+</html>
