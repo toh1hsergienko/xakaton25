@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_86f2a2cf4006c869deb693a4c699a320 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_86f2a2cf4006c869deb693a4c699a320" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_86f2a2cf4006c869deb693a4c699a320 = L.map(
+                "map_86f2a2cf4006c869deb693a4c699a320",
+                {
+                    center: [47.2312, 39.7086],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 13,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_7e7e7f5f71d567cedf6aa32f37abbe0f = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_7e7e7f5f71d567cedf6aa32f37abbe0f.addTo(map_86f2a2cf4006c869deb693a4c699a320);
+        
+    
+            var marker_0971c0d2652b4777fd4816961f025858 = L.marker(
+                [47.2312, 39.7086],
+                {
+}
+            ).addTo(map_86f2a2cf4006c869deb693a4c699a320);
+        
+    
+            var icon_96994698e9eb9ef31234d391f1cd33bf = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_dadf99a003bd70d30e0908d022bd5233 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_8bf9de5c54db59e7c2f0afa247088a06 = $(`<div id="html_8bf9de5c54db59e7c2f0afa247088a06" style="width: 100.0%; height: 100.0%;">Ваша позиция</div>`)[0];
+                popup_dadf99a003bd70d30e0908d022bd5233.setContent(html_8bf9de5c54db59e7c2f0afa247088a06);
+            
+        
+
+        marker_0971c0d2652b4777fd4816961f025858.bindPopup(popup_dadf99a003bd70d30e0908d022bd5233)
+        ;
+
+        
+    
+    
+                marker_0971c0d2652b4777fd4816961f025858.setIcon(icon_96994698e9eb9ef31234d391f1cd33bf);
+            
+    
+            var marker_5b3d2aea29987b4494760a36c6741a93 = L.marker(
+                [47.2303528, 39.7034823],
+                {
+}
+            ).addTo(map_86f2a2cf4006c869deb693a4c699a320);
+        
+    
+        var popup_d69777a05203433f7ce29a79d9cd7c65 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_5833f4f243d36cc567d4236feb77602e = $(`<div id="html_5833f4f243d36cc567d4236feb77602e" style="width: 100.0%; height: 100.0%;">Комплекс казенных винных складов</div>`)[0];
+                popup_d69777a05203433f7ce29a79d9cd7c65.setContent(html_5833f4f243d36cc567d4236feb77602e);
+            
+        
+
+        marker_5b3d2aea29987b4494760a36c6741a93.bindPopup(popup_d69777a05203433f7ce29a79d9cd7c65)
+        ;
+
+        
+    
+    
+            var marker_85e8ce5e1ecfb1868b8cda05733c7307 = L.marker(
+                [47.223921, 39.7090507],
+                {
+}
+            ).addTo(map_86f2a2cf4006c869deb693a4c699a320);
+        
+    
+        var popup_658e924af4a9133d982b827a7d7fe06b = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_3ab8db4b52733c23e3ffe0bee54c8599 = $(`<div id="html_3ab8db4b52733c23e3ffe0bee54c8599" style="width: 100.0%; height: 100.0%;">Памятный знак "Ротонда"</div>`)[0];
+                popup_658e924af4a9133d982b827a7d7fe06b.setContent(html_3ab8db4b52733c23e3ffe0bee54c8599);
+            
+        
+
+        marker_85e8ce5e1ecfb1868b8cda05733c7307.bindPopup(popup_658e924af4a9133d982b827a7d7fe06b)
+        ;
+
+        
+    
+    
+            var marker_2933b3fa4e92ce53d67f770ae77b69c8 = L.marker(
+                [47.2257544, 39.715776],
+                {
+}
+            ).addTo(map_86f2a2cf4006c869deb693a4c699a320);
+        
+    
+        var popup_a291b3763ec7d71829c64718571f1151 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_0c7d0cfc6e378cf167d1bdb6e9bc6b0c = $(`<div id="html_0c7d0cfc6e378cf167d1bdb6e9bc6b0c" style="width: 100.0%; height: 100.0%;">Ростовский областной музей изобразительных искусств</div>`)[0];
+                popup_a291b3763ec7d71829c64718571f1151.setContent(html_0c7d0cfc6e378cf167d1bdb6e9bc6b0c);
+            
+        
+
+        marker_2933b3fa4e92ce53d67f770ae77b69c8.bindPopup(popup_a291b3763ec7d71829c64718571f1151)
+        ;
+
+        
+    
+    
+            var poly_line_4a55f62f4ef21a0efeb533cef36f0f2e = L.polyline(
+                [[47.231233, 39.708761], [47.232757, 39.708072], [47.232627, 39.707449], [47.232653, 39.707244], [47.232264, 39.705352], [47.231521, 39.705719], [47.229306, 39.706691], [47.228709, 39.703818], [47.230287, 39.703132], [47.230287, 39.703132], [47.230898, 39.702878], [47.231521, 39.705719], [47.225411, 39.708379], [47.224782, 39.705477], [47.223482, 39.706033], [47.223193, 39.706164], [47.223821, 39.709098], [47.223821, 39.709098], [47.225496, 39.717023], [47.22561, 39.717006], [47.225722, 39.716901], [47.225505, 39.715892]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 5}
+            ).addTo(map_86f2a2cf4006c869deb693a4c699a320);
+        
+</script>
+</html>
