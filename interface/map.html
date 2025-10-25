@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карта маршрута</title>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=52b1dace-d2d5-4f52-a969-b2623534206a&lang=ru_RU"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+        
+        .control-panel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .route-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .category-btn {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 6px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .category-btn:hover {
+            background: #e0e0e0;
+        }
+        
+        .category-btn.active {
+            background: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+        
+        .user-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="control-panel">
+        <div class="search-container">
+            <input type="text" id="start-point" class="search-input" placeholder="Откуда (например, Москва, Красная площадь)">
+            <input type="text" id="end-point" class="search-input" placeholder="Куда (например, Москва, ВДНХ)">
+            <button class="route-button" onclick="calculateRoute()">Построить маршрут</button>
+        </div>
+        
+        <div class="categories">
+            <button class="category-btn" onclick="searchPlaces('развлечения')">🎭 Развлечения</button>
+            <button class="category-btn" onclick="searchPlaces('спорт')">⚽ Спорт</button>
+            <button class="category-btn" onclick="searchPlaces('достопримечательности')">🏛️ Достопримечательности</button>
+            <button class="category-btn" onclick="searchPlaces('кафе')">☕ Кафе</button>
+            <button class="category-btn" onclick="searchPlaces('рестораны')">🍽️ Рестораны</button>
+            <button class="category-btn" onclick="searchPlaces('магазины')">🛍️ Магазины</button>
+        </div>
+    </div>
+    
+    <div class="user-info" id="user-info">
+        Пользователь: <span id="username">Гость</span>
+    </div>
+    
+    <div id="map"></div>
+
+    <script>
+        // Глобальные переменные
+        let map, multiRoute, placemarks = [];
+        let username = 'Гость';
+        
+        // Инициализация карты
+        ymaps.ready(init);
+        
+        function init() {
+            // Создаем карту
+            map = new ymaps.Map("map", {
+                center: [55.7558, 37.6173], // Москва по умолчанию
+                zoom: 12
+            });
+            
+            // Добавляем поиск
+            const searchControl = new ymaps.control.SearchControl({
+                options: {
+                    provider: 'yandex#search',
+                    noPlacemark: true
+                }
+            });
+            map.controls.add(searchControl);
+            
+            // Обработчик выбора из поиска
+            searchControl.events.add('resultselect', function (e) {
+                const results = searchControl.getResultsArray();
+                const selected = results[e.get('index')];
+                addPlacemark(selected.geometry.getCoordinates(), selected.properties.get('name'));
+            });
+            
+            // Инициализация автодополнения
+            initSuggest();
+            
+            // Загружаем имя пользователя из localStorage
+            const savedUsername = localStorage.getItem('username');
+            if (savedUsername) {
+                username = savedUsername;
+                document.getElementById('username').textContent = username;
+            }
+        }
+        
+        function initSuggest() {
+            // Автодополнение для полей ввода
+            new ymaps.SuggestView('start-point');
+            new ymaps.SuggestView('end-point');
+        }
+        
+        function calculateRoute() {
+            const start = document.getElementById('start-point').value;
+            const end = document.getElementById('end-point').value;
+            
+            if (!start || !end) {
+                alert('Пожалуйста, введите начальную и конечную точки');
+                return;
+            }
+            
+            // Показываем загрузку
+            showLoading(true);
+            
+            // Геокодируем точки
+            Promise.all([
+                ymaps.geocode(start),
+                ymaps.geocode(end)
+            ]).then(function(results) {
+                const startCoords = results[0].geoObjects.get(0).geometry.getCoordinates();
+                const endCoords = results[1].geoObjects.get(0).geometry.getCoordinates();
+                
+                // Удаляем старый маршрут
+                if (multiRoute) {
+                    map.geoObjects.remove(multiRoute);
+                }
+                
+                // Создаем новый маршрут
+                multiRoute = new ymaps.multiRouter.MultiRoute({
+                    referencePoints: [startCoords, endCoords],
+                    params: {
+                        routingMode: 'pedestrian' // Можно изменить на 'auto' или 'masstransit'
+                    }
+                }, {
+                    boundsAutoApply: true,
+                    wayPointStartIconColor: '#00FF00',
+                    wayPointFinishIconColor: '#FF0000'
+                });
+                
+                map.geoObjects.add(multiRoute);
+                
+                // Добавляем метки
+                addPlacemark(startCoords, 'Начало: ' + start);
+                addPlacemark(endCoords, 'Конец: ' + end);
+                
+                // Сохраняем маршрут в историю
+                saveToHistory(start, end);
+                
+            }).catch(function(error) {
+                alert('Ошибка при построении маршрута. Проверьте правильность введенных адресов.');
+                console.error('Route error:', error);
+            }).finally(function() {
+                showLoading(false);
+            });
+        }
+        
+        function searchPlaces(category) {
+            // Очищаем предыдущие метки
+            clearPlacemarks();
+            
+            // Получаем текущий центр карты
+            const center = map.getCenter();
+            
+            // Ищем организации по категории
+            ymaps.geocode(center, {
+                kind: 'house',
+                results: 1
+            }).then(function (res) {
+                const nearest = res.geoObjects.get(0);
+                if (nearest) {
+                    // Используем поиск по организациям
+                    const searchControl = new ymaps.control.SearchControl({
+                        options: {
+                            provider: 'yandex#search',
+                            kind: 'business'
+                        }
+                    });
+                    
+                    // Ищем организации в текущей области видимости
+                    const bounds = map.getBounds();
+                    searchControl.search(category, {
+                        boundedBy: bounds,
+                        strictBounds: true
+                    }).then(function() {
+                        const results = searchControl.getResultsArray();
+                        results.forEach(function(result) {
+                            addPlacemark(
+                                result.geometry.getCoordinates(), 
+                                result.properties.get('name') + '\n' + 
+                                (result.properties.get('description') || '')
+                            );
+                        });
+                    });
+                }
+            });
+        }
+        
+        function addPlacemark(coords, title) {
+            const placemark = new ymaps.Placemark(coords, {
+                balloonContent: title
+            }, {
+                preset: 'islands#blueIcon'
+            });
+            
+            map.geoObjects.add(placemark);
+            placemarks.push(placemark);
+        }
+        
+        function clearPlacemarks() {
+            placemarks.forEach(pm => map.geoObjects.remove(pm));
+            placemarks = [];
+        }
+        
+        function showLoading(show) {
+            // Простая реализация индикатора загрузки
+            const button = document.querySelector('.route-button');
+            if (show) {
+                button.textContent = 'Построение...';
+                button.disabled = true;
+            } else {
+                button.textContent = 'Построить маршрут';
+                button.disabled = false;
+            }
+        }
+        
+        function saveToHistory(start, end) {
+            // Сохраняем маршрут в localStorage
+            const history = JSON.parse(localStorage.getItem('routeHistory') || '[]');
+            history.unshift({
+                start: start,
+                end: end,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Сохраняем только последние 10 маршрутов
+            if (history.length > 10) {
+                history.pop();
+            }
+            
+            localStorage.setItem('routeHistory', JSON.stringify(history));
+        }
+        
+        // Функция для установки имени пользователя из Flet
+        window.setUsername = function(name) {
+            username = name;
+            document.getElementById('username').textContent = username;
+            localStorage.setItem('username', name);
+        };
+        
+        // Функция для установки начальных точек маршрута
+        window.setRoutePoints = function(start, end) {
+            document.getElementById('start-point').value = start;
+            document.getElementById('end-point').value = end;
+        };
+    </script>
+</body>
+</html>
