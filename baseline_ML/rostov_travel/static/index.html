@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rostov Travel Planner</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #f9f9f9;
+    }
+
+    /* Меню в правом верхнем углу */
+    .top-menu {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .menu-btn {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .menu-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      width: 220px;
+      margin-top: 8px;
+    }
+
+    .menu-dropdown a {
+      display: block;
+      padding: 12px 16px;
+      text-decoration: none;
+      color: #333;
+      font-size: 15px;
+    }
+
+    .menu-dropdown a:hover {
+      background: #f0f0f0;
+    }
+
+    /* Основной контейнер */
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    /* Карта */
+    #map {
+      flex: 1;
+      z-index: 1;
+    }
+
+    /* Панель управления (скрыта по умолчанию) */
+    .panel {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+      max-width: 90%;
+      max-height: 70vh;
+      overflow-y: auto;
+      z-index: 999;
+      display: none;
+      padding: 16px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .panel-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .close-panel {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #666;
+    }
+
+    /* Карточки достопримечательностей */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      border: 1px solid #eee;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .card-img {
+      width: 100%;
+      height: 140px;
+      background: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      font-size: 12px;
+    }
+
+    .card-body {
+      padding: 12px;
+    }
+
+    .card-title {
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .card-meta {
+      font-size: 13px;
+      color: #666;
+      margin: 4px 0;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .btn-accept { background: #4CAF50; color: white; }
+    .btn-reject { background: #f44336; color: white; }
+
+    /* Форма маршрута */
+    .route-form {
+      display: none;
+      position: absolute;
+      top: 80px;
+      right: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      width: 300px;
+      z-index: 998;
+    }
+
+    .route-form h3 {
+      margin-bottom: 16px;
+      font-size: 18px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .form-btns {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .form-btn {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .btn-primary { background: #2196F3; color: white; }
+    .btn-secondary { background: #ccc; color: black; }
+
+    /* Категории */
+    .categories-panel {
+      display: none;
+      position: absolute;
+      top: 80px;
+      left: 20px;
+      background: white;
+      padding: 16px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      max-height: 80vh;
+      overflow-y: auto;
+      z-index: 998;
+      width: 250px;
+    }
+
+    .categories-panel h3 {
+      margin-bottom: 12px;
+    }
+
+    .category-item {
+      display: flex;
+      align-items: center;
+      margin: 6px 0;
+    }
+
+    .category-item input {
+      margin-right: 8px;
+    }
+
+    /* Скрытие панелей */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- Меню -->
+<div class="top-menu">
+  <button class="menu-btn" id="menuToggle">☰ Меню</button>
+  <div class="menu-dropdown" id="menuDropdown">
+    <a href="#" id="btnCategories">Категории</a>
+    <a href="#" id="btnRoute">Маршрут пользователя</a>
+    <a href="#" id="btnOthers">Чужие маршруты</a>
+    <a href="#" id="btnProfile">Профиль</a>
+  </div>
+</div>
+
+<!-- Карта -->
+<div id="map"></div>
+
+<!-- Панель рекомендаций (LLM) -->
+<div class="panel" id="recommendationsPanel">
+  <div class="panel-header">
+    <div class="panel-title">Рекомендуемые места</div>
+    <button class="close-panel" id="closeRecommendations">&times;</button>
+  </div>
+  <div class="cards" id="recommendationsCards">
+    <!-- Сюда подгружаются карточки -->
+  </div>
+</div>
+
+<!-- Форма создания маршрута -->
+<div class="route-form" id="routeForm">
+  <h3>Новый маршрут</h3>
+  <div class="form-group">
+    <label>Тип транспорта</label>
+    <select id="transportType">
+      <option value="walking">Пешком</option>
+      <option value="driving">На машине</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Ваша позиция (lat)</label>
+    <input type="number" step="any" id="userLat" placeholder="47.2312" value="47.2312">
+  </div>
+  <div class="form-group">
+    <label>Ваша позиция (lon)</label>
+    <input type="number" step="any" id="userLon" placeholder="39.7086" value="39.7086">
+  </div>
+  <div class="form-btns">
+    <button class="form-btn btn-secondary" id="cancelRoute">Отмена</button>
+    <button class="form-btn btn-primary" id="submitRoute">Получить рекомендации</button>
+  </div>
+</div>
+
+<!-- Панель категорий -->
+<div class="categories-panel" id="categoriesPanel">
+  <h3>Категории</h3>
+  <div id="categoryList">
+    <!-- Загружается из БД -->
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // ==============================
+  // Инициализация карты
+  // ==============================
+  const map = L.map('map').setView([47.2312, 39.7086], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // ==============================
+  // Глобальные переменные
+  // ==============================
+  let selectedPlaces = [];
+  let markers = [];
+
+  // ==============================
+  // Меню
+  // ==============================
+  const menuToggle = document.getElementById('menuToggle');
+  const menuDropdown = document.getElementById('menuDropdown');
+
+  menuToggle.addEventListener('click', () => {
+    menuDropdown.style.display = menuDropdown.style.display === 'block' ? 'none' : 'block';
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!menuToggle.contains(e.target) && !menuDropdown.contains(e.target)) {
+      menuDropdown.style.display = 'none';
+    }
+  });
+
+  // ==============================
+  // Обработчики кнопок меню
+  // ==============================
+  document.getElementById('btnRoute').addEventListener('click', () => {
+    document.getElementById('routeForm').style.display = 'block';
+    menuDropdown.style.display = 'none';
+  });
+
+  document.getElementById('btnCategories').addEventListener('click', () => {
+    loadCategories();
+    document.getElementById('categoriesPanel').style.display = 'block';
+    menuDropdown.style.display = 'none';
+  });
+
+  document.getElementById('btnOthers').addEventListener('click', () => {
+    alert('Чужие маршруты — заглушка (4–5 маршрутов будут отображаться в будущем)');
+    menuDropdown.style.display = 'none';
+  });
+
+  document.getElementById('btnProfile').addEventListener('click', () => {
+    alert('Профиль — заглушка (имя, избранное, пройденные маршруты)');
+    menuDropdown.style.display = 'none';
+  });
+
+  // ==============================
+  // Форма маршрута
+  // ==============================
+  document.getElementById('cancelRoute').addEventListener('click', () => {
+    document.getElementById('routeForm').style.display = 'none';
+  });
+
+  document.getElementById('submitRoute').addEventListener('click', async () => {
+    const transport = document.getElementById('transportType').value;
+    const lat = parseFloat(document.getElementById('userLat').value);
+    const lon = parseFloat(document.getElementById('userLon').value);
+
+    if (isNaN(lat) || isNaN(lon)) {
+      alert('Введите корректные координаты');
+      return;
+    }
+
+    // Отправка запроса на бэкенд
+    try {
+      const response = await fetch('/api/get-recommendations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lat, lon, transport })
+      });
+
+      if (!response.ok) throw new Error('Ошибка бэкенда');
+
+      const data = await response.json();
+      renderRecommendations(data.recommendations);
+      document.getElementById('routeForm').style.display = 'none';
+      document.getElementById('recommendationsPanel').style.display = 'block';
+
+      // Центрируем карту на пользователе
+      map.setView([lat, lon], 13);
+      // Удаляем старые маркеры
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+      // Добавляем маркер пользователя
+      const userMarker = L.marker([lat, lon]).addTo(map)
+        .bindPopup('Ваша позиция');
+      markers.push(userMarker);
+    } catch (err) {
+      alert('Не удалось получить рекомендации: ' + err.message);
+    }
+  });
+
+  // ==============================
+  // Рендер рекомендаций
+  // ==============================
+  function renderRecommendations(places) {
+    const container = document.getElementById('recommendationsCards');
+    container.innerHTML = '';
+
+    places.forEach(place => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-img">Фото: ${place.name}</div>
+        <div class="card-body">
+          <div class="card-title">${place.name}</div>
+          <div class="card-meta">Категория: ${place.category || '—'}</div>
+          <div class="card-meta">Расстояние: ${place.distance_km.toFixed(2)} км</div>
+          <div class="card-meta">Рейтинг: ${place.rating ? '⭐'.repeat(Math.round(place.rating)) : '—'}</div>
+          <div class="card-actions">
+            <button class="btn btn-accept" data-id="${place.id}">Выбрать</button>
+            <button class="btn btn-reject" data-id="${place.id}">Пропустить</button>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+
+    // Обработчики кнопок
+    document.querySelectorAll('.btn-accept').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = e.target.dataset.id;
+        const place = places.find(p => p.id == id);
+        if (place && !selectedPlaces.some(p => p.id == id)) {
+          selectedPlaces.push(place);
+          // Добавляем маркер на карту
+          const marker = L.marker([place.lat, place.lon]).addTo(map)
+            .bindPopup(place.name);
+          markers.push(marker);
+        }
+      });
+    });
+
+    document.querySelectorAll('.btn-reject').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = e.target.dataset.id;
+        selectedPlaces = selectedPlaces.filter(p => p.id != id);
+        // Удаляем маркер с карты (опционально)
+      });
+    });
+  }
+
+  // ==============================
+  // Загрузка категорий
+  // ==============================
+  async function loadCategories() {
+    try {
+      const response = await fetch('/api/categories');
+      const categories = await response.json();
+      const container = document.getElementById('categoryList');
+      container.innerHTML = '';
+
+      categories.forEach(cat => {
+        const div = document.createElement('div');
+        div.className = 'category-item';
+        div.innerHTML = `<input type="checkbox" id="cat-${cat}" value="${cat}"> <label for="cat-${cat}">${cat}</label>`;
+        container.appendChild(div);
+      });
+    } catch (err) {
+      console.error('Не удалось загрузить категории');
+    }
+  }
+
+  // ==============================
+  // Закрытие панелей
+  // ==============================
+  document.getElementById('closeRecommendations').addEventListener('click', () => {
+    document.getElementById('recommendationsPanel').style.display = 'none';
+  });
+</script>
+</body>
+</html>

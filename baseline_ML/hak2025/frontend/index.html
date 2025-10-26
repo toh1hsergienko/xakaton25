@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ростов-на-Дону: Достопримечательности</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+        
+        .recommendations-section {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .recommendations-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+        }
+        
+        .attraction-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        
+        .attraction-card:hover {
+            transform: translateY(-3px);
+            border-color: #667eea;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .card-image {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #333;
+            line-height: 1.3;
+        }
+        
+        .card-category {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+        
+        .card-distance {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        
+        .card-rating {
+            color: #ffc107;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .card-description {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-add {
+            flex: 1;
+            padding: 6px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+        
+        .btn-add:hover {
+            background: #5a6fd8;
+        }
+        
+        .btn-add.added {
+            background: #28a745;
+        }
+        
+        .btn-skip {
+            flex: 1;
+            padding: 6px;
+            background: #f8f9fa;
+            color: #666;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .btn-skip:hover {
+            background: #e9ecef;
+            border-color: #666;
+        }
+        
+        .map-container {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #map {
+            flex: 1;
+            width: 100%;
+            border-radius: 20px;
+        }
+        
+        .search-container {
+            padding: 20px;
+            background: white;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+            margin-right: 15px;
+        }
+        
+        .search-input:focus {
+            border-color: #667eea;
+        }
+        
+        .menu-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .build-route-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.3s;
+            width: 100%;
+        }
+        
+        .build-route-btn:hover {
+            transform: scale(1.02);
+        }
+        
+        .selected-count {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin: 15px auto 0;
+            text-align: center;
+            width: fit-content;
+        }
+        
+        /* Dropdown Menu */
+        .dropdown-menu {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            min-width: 250px;
+            display: none;
+        }
+        
+        .dropdown-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .dropdown-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Categories Modal */
+        .categories-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            z-index: 2000;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .categories-header {
+            padding: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .categories-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .close-categories {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .categories-body {
+            padding: 20px;
+        }
+        
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+        
+        .category-btn {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .category-btn:hover {
+            border-color: #667eea;
+        }
+        
+        .category-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .category-icon {
+            font-size: 24px;
+        }
+        
+        /* Profile Modal */
+        .profile-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            z-index: 2000;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .profile-header {
+            padding: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .profile-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .close-profile {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .profile-body {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+        }
+        
+        .profile-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .profile-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .profile-btn {
+            padding: 15px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .profile-btn:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+        
+        .profile-btn i {
+            font-size: 20px;
+        }
+        
+        /* Modal for Recommendations */
+        .modal {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+            z-index: 2000;
+            width: 90%;
+            max-width: 800px;
+            max-height: 60vh;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .modal-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .modal-card-image {
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .modal-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .modal-card-rating {
+            color: #ffc107;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+        
+        .modal-card-distance {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .modal-card-description {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 6px;
+            border-radius: 6px;
+            border: none;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .modal-btn-accept {
+            background: #28a745;
+            color: white;
+        }
+        
+        .modal-btn-reject {
+            background: #dc3545;
+            color: white;
+        }
+        
+        @media (max-width: 1200px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .recommendations-section,
+            .map-container {
+                max-height: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 10px;
+            }
+            
+            .card-image {
+                height: 100px;
+                font-size: 28px;
+            }
+            
+            .card-title {
+                font-size: 14px;
+            }
+            
+            .search-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .menu-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Recommendations Section (Left) -->
+        <div class="recommendations-section">
+            <h3 class="section-title">Рекомендуемые места</h3>
+            <div class="recommendations-grid" id="recommendations-grid">
+                <!-- Attraction cards will be generated here -->
+            </div>
+            <span class="selected-count">Выбрано: <span id="selected-count">0</span></span>
+            <button class="build-route-btn" id="build-route-btn">
+                <i class="fas fa-route"></i> Построить маршрут
+            </button>
+        </div>
+
+        <!-- Map Container (Right) -->
+        <div class="map-container">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Введите адрес или выберите 'Моё местоположение'" value="Центр Ростова-на-Дону">
+                <button class="menu-btn" id="menu-btn">
+                    <i class="fas fa-bars"></i> Меню
+                </button>
+            </div>
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <!-- Dropdown Menu -->
+    <div class="dropdown-menu" id="dropdown-menu">
+        <div class="dropdown-item" data-action="categories">
+            <i class="fas fa-th"></i> Категории
+        </div>
+        <div class="dropdown-item" data-action="my-routes">
+            <i class="fas fa-route"></i> Маршрут пользователя
+        </div>
+        <div class="dropdown-item" data-action="other-routes">
+            <i class="fas fa-users"></i> Маршруты других
+        </div>
+        <div class="dropdown-item" data-action="profile">
+            <i class="fas fa-user"></i> Профиль
+        </div>
+    </div>
+
+    <!-- Categories Modal -->
+    <div class="categories-modal" id="categories-modal">
+        <div class="categories-header">
+            <div class="categories-title">Категории</div>
+            <button class="close-categories" id="close-categories">&times;</button>
+        </div>
+        <div class="categories-body">
+            <div class="categories-grid">
+                <div class="category-btn active">
+                    <i class="fas fa-th category-icon"></i>
+                    <span>Все категории</span>
+                </div>
+                <div class="category-btn">
+                    <i class="fas fa-star category-icon"></i>
+                    <span>18+</span>
+                </div>
+                <div class="category-btn">
+                    <i class="fas fa-mug-hot category-icon"></i>
+                    <span>Чайные</span>
+                </div>
+                <div class="category-btn">
+                    <i class="fas fa-utensils category-icon"></i>
+                    <span>Рестораны</span>
+                </div>
+                <div class="category-btn">
+                    <i class="fas fa-landmark category-icon"></i>
+                    <span>Музеи</span>
+                </div>
+                <div class="category-btn">
+                    <i class="fas fa-tree category-icon"></i>
+                    <span>Парки</span>
+                </div>
+                <div class="category-btn">
+                    <i class="fas fa-monument category-icon"></i>
+                    <span>Мемориалы</span>
+                </div>
+                <div class="category-btn">
+                    <i class="fas fa-church category-icon"></i>
+                    <span>Храмы</span>
+                </div>
+                <div class="category-btn">
+                    <i class="fas fa-ship category-icon"></i>
+                    <span>Набережная</span>
+                </div>
+                <div class="category-btn">
+                    <i class="fas fa-theater-masks category-icon"></i>
+                    <span>Театры</span>
+                </div>
+                <div class="category-btn">
+                    <i class="fas fa-paw category-icon"></i>
+                    <span>Зоопарк</span>
+                </div>
+                <div class="category-btn">
+                    <i class="fas fa-shopping-bag category-icon"></i>
+                    <span>Торговые центры</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="profile-modal" id="profile-modal">
+        <div class="profile-header">
+            <div class="profile-title">Профиль</div>
+            <button class="close-profile" id="close-profile">&times;</button>
+        </div>
+        <div class="profile-body">
+            <div class="profile-avatar">😊</div>
+            <div class="profile-name">Александр Иванов</div>
+            <div class="profile-sections">
+                <button class="profile-btn" id="saved-routes-btn">
+                    <i class="fas fa-heart"></i> Сохранённые маршруты
+                </button>
+                <button class="profile-btn" id="completed-routes-btn">
+                    <i class="fas fa-check-circle"></i> Пройденные маршруты
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Recommendations -->
+    <div class="modal" id="recommendations-modal">
+        <div class="modal-header">
+            <div class="modal-title">Рекомендованные места для вашего маршрута</div>
+            <button class="close-modal" id="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-cards" id="modal-cards">
+                <!-- Modal cards will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialize map
+        const map = L.map('map').setView([47.2357, 39.7015], 13);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Sample attractions data for Rostov-on-Don
+        const attractions = [
+            {
+                id: 1,
+                name: "Ростовский академический театр драмы им. М. Горького",
+                category: "Театры",
+                distance: "0.8 км",
+                lat: 47.2389,
+                lng: 39.7047,
+                icon: "🎭",
+                rating: "4.7",
+                description: "Один из старейших театров России, основанный в 1868 году."
+            },
+            {
+                id: 2,
+                name: "Ростовский областной музей изобразительных искусств",
+                category: "Музеи",
+                distance: "1.2 км",
+                lat: 47.2321,
+                lng: 39.7089,
+                icon: "🏛️",
+                rating: "4.5",
+                description: "Богатая коллекция русского и западноевропейского искусства."
+            },
+            {
+                id: 3,
+                name: "Парк им. Октябрьской революции",
+                category: "Парки",
+                distance: "0.5 км",
+                lat: 47.2401,
+                lng: 39.7102,
+                icon: "🌳",
+                rating: "4.3",
+                description: "Один из самых старых парков Ростова с аттракционами и аллеями."
+            },
+            {
+                id: 4,
+                name: "Мемориал «Воинской славы»",
+                category: "Мемориалы",
+                distance: "2.1 км",
+                lat: 47.2289,
+                lng: 39.6934,
+                icon: "🗿",
+                rating: "4.8",
+                description: "Памятник погибшим воинам-ростовчанам в годы Великой Отечественной войны."
+            },
+            {
+                id: 5,
+                name: "Ресторан «Донской дворик»",
+                category: "Рестораны",
+                distance: "1.5 км",
+                lat: 47.2367,
+                lng: 39.7156,
+                icon: "🍽️",
+                rating: "4.4",
+                description: "Традиционная донская кухня в уютной атмосфере."
+            },
+            {
+                id: 6,
+                name: "Ростовский зоопарк",
+                category: "Зоопарк",
+                distance: "3.2 км",
+                lat: 47.2512,
+                lng: 39.7234,
+                icon: "🦁",
+                rating: "4.2",
+                description: "Один из крупнейших зоопарков Юга России."
+            },
+            {
+                id: 7,
+                name: "Собор Рождества Пресвятой Богородицы",
+                category: "Храмы",
+                distance: "1.1 км",
+                lat: 47.2345,
+                lng: 39.7067,
+                icon: "⛪",
+                rating: "4.6",
+                description: "Главный православный храм Ростова-на-Дону."
+            },
+            {
+                id: 8,
+                name: "Набережная реки Дон",
+                category: "Набережная",
+                distance: "0.9 км",
+                lat: 47.2298,
+                lng: 39.7123,
+                icon: "🌊",
+                rating: "4.9",
+                description: "Живописная набережная с видом на реку Дон и исторический центр."
+            }
+        ];
+
+        // Sample other routes
+        const otherRoutes = [
+            {
+                id: 1,
+                name: "Исторический центр Ростова",
+                description: "Прогулка по самым значимым историческим местам города",
+                duration: "3 часа",
+                attractions: 6
+            },
+            {
+                id: 2,
+                name: "Культурный маршрут",
+                description: "Театры, музеи и галереи за один день",
+                duration: "5 часов",
+                attractions: 4
+            },
+            {
+                id: 3,
+                name: "Парковый отдых",
+                description: "Расслабляющая прогулка по лучшим паркам города",
+                duration: "2 часа",
+                attractions: 3
+            },
+            {
+                id: 4,
+                name: "Гастрономический тур",
+                description: "Лучшие рестораны и кафе Ростова-на-Дону",
+                duration: "4 часа",
+                attractions: 5
+            }
+        ];
+
+        // Sample user data
+        const userRoutes = [
+            {
+                id: 1,
+                name: "Мой первый маршрут",
+                date: "15.12.2023",
+                attractions: 5,
+                type: "пешком"
+            },
+            {
+                id: 2,
+                name: "Театральный вечер",
+                date: "20.12.2023",
+                attractions: 3,
+                type: "машина"
+            }
+        ];
+
+        const completedRoutes = [
+            {
+                id: 1,
+                name: "Исторический центр",
+                date: "10.12.2023",
+                attractions: 6,
+                duration: "2.5 часа"
+            },
+            {
+                id: 2,
+                name: "Парковая прогулка",
+                date: "05.12.2023",
+                attractions: 4,
+                duration: "1.5 часа"
+            }
+        ];
+
+        // Create markers for attractions
+        const markers = [];
+        attractions.forEach(attraction => {
+            const marker = L.marker([attraction.lat, attraction.lng]).addTo(map)
+                .bindPopup(`<b>${attraction.name}</b><br>${attraction.category}<br>Рейтинг: ${attraction.rating}<br>Расстояние: ${attraction.distance}`);
+            markers.push(marker);
+        });
+
+        // Generate attraction cards
+        const recommendationsGrid = document.getElementById('recommendations-grid');
+        const selectedCountElement = document.getElementById('selected-count');
+        let selectedCount = 0;
+
+        attractions.forEach(attraction => {
+            const card = document.createElement('div');
+            card.className = 'attraction-card';
+            card.innerHTML = `
+                <div class="card-image">${attraction.icon}</div>
+                <h4 class="card-title">${attraction.name}</h4>
+                <span class="card-category">${attraction.category}</span>
+                <div class="card-rating">
+                    <i class="fas fa-star"></i> ${attraction.rating}
+                </div>
+                <div class="card-distance">Расстояние: ${attraction.distance}</div>
+                <div class="card-description">${attraction.description}</div>
+                <div class="card-actions">
+                    <button class="btn-add" data-id="${attraction.id}">
+                        <i class="fas fa-plus"></i> Добавить
+                    </button>
+                    <button class="btn-skip" data-id="${attraction.id}">
+                        <i class="fas fa-times"></i> Пропустить
+                    </button>
+                </div>
+            `;
+            recommendationsGrid.appendChild(card);
+        });
+
+        // Handle add/skip buttons
+        document.querySelectorAll('.btn-add').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const attractionId = this.getAttribute('data-id');
+                this.innerHTML = '<i class="fas fa-check"></i> Добавлено';
+                this.classList.add('added');
+                this.disabled = true;
+                selectedCount++;
+                selectedCountElement.textContent = selectedCount;
+                
+                // Highlight marker on map
+                const attraction = attractions.find(a => a.id == attractionId);
+                if (attraction) {
+                    const marker = markers.find(m => 
+                        m.getLatLng().lat === attraction.lat && 
+                        m.getLatLng().lng === attraction.lng
+                    );
+                    if (marker) {
+                        marker.openPopup();
+                    }
+                }
+            });
+        });
+
+        document.querySelectorAll('.btn-skip').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const card = this.closest('.attraction-card');
+                card.style.opacity = '0.5';
+                card.style.pointerEvents = 'none';
+            });
+        });
+
+        // Build route button - opens modal with recommendations
+        document.getElementById('build-route-btn').addEventListener('click', function() {
+            if (selectedCount === 0) {
+                alert('Пожалуйста, выберите хотя бы одно место для построения маршрута!');
+                return;
+            }
+            
+            // Generate modal cards based on user's selection and past routes
+            const modalCards = document.getElementById('modal-cards');
+            modalCards.innerHTML = '';
+            
+            // Simulate LLM recommendations based on user preferences
+            const recommendedAttractions = attractions.filter(attr => 
+                !document.querySelector(`.btn-add[data-id="${attr.id}"]`).classList.contains('added')
+            ).slice(0, 4);
+            
+            recommendedAttractions.forEach(attraction => {
+                const card = document.createElement('div');
+                card.className = 'modal-card';
+                card.innerHTML = `
+                    <div class="modal-card-image">${attraction.icon}</div>
+                    <h4 class="modal-card-title">${attraction.name}</h4>
+                    <div class="modal-card-rating">
+                        <i class="fas fa-star"></i> ${attraction.rating}
+                    </div>
+                    <div class="modal-card-distance">Расстояние: ${attraction.distance}</div>
+                    <div class="modal-card-description">${attraction.description}</div>
+                    <div class="modal-actions">
+                        <button class="modal-btn modal-btn-accept" data-id="${attraction.id}">
+                            Принять
+                        </button>
+                        <button class="modal-btn modal-btn-reject" data-id="${attraction.id}">
+                            Отклонить
+                        </button>
+                    </div>
+                `;
+                modalCards.appendChild(card);
+            });
+            
+            document.getElementById('recommendations-modal').style.display = 'block';
+        });
+
+        // Close modals
+        document.getElementById('close-modal').addEventListener('click', function() {
+            document.getElementById('recommendations-modal').style.display = 'none';
+        });
+
+        document.getElementById('close-categories').addEventListener('click', function() {
+            document.getElementById('categories-modal').style.display = 'none';
+        });
+
+        document.getElementById('close-profile').addEventListener('click', function() {
+            document.getElementById('profile-modal').style.display = 'none';
+        });
+
+        // Modal accept/reject buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal-btn-accept')) {
+                const attractionId = e.target.getAttribute('data-id');
+                // Add to route logic would go here
+                e.target.textContent = 'Добавлено';
+                e.target.disabled = true;
+                e.target.style.background = '#28a745';
+            }
+            
+            if (e.target.classList.contains('modal-btn-reject')) {
+                const card = e.target.closest('.modal-card');
+                card.style.opacity = '0.5';
+                card.style.pointerEvents = 'none';
+            }
+        });
+
+        // Menu dropdown functionality
+        const menuBtn = document.getElementById('menu-btn');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+        
+        menuBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!menuBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.style.display = 'none';
+            }
+        });
+        
+        // Dropdown menu actions
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const action = this.getAttribute('data-action');
+                dropdownMenu.style.display = 'none';
+                
+                switch(action) {
+                    case 'categories':
+                        document.getElementById('categories-modal').style.display = 'block';
+                        break;
+                    case 'my-routes':
+                        showMyRoutes();
+                        break;
+                    case 'other-routes':
+                        showOtherRoutes();
+                        break;
+                    case 'profile':
+                        document.getElementById('profile-modal').style.display = 'block';
+                        break;
+                }
+            });
+        });
+        
+        // Categories toggle functionality
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active from "Все категории" if any other is selected
+                if (this.querySelector('i').className.includes('fa-th')) {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                } else {
+                    this.classList.toggle('active');
+                    const allCategoriesBtn = document.querySelector('.category-btn:first-child');
+                    if (document.querySelectorAll('.category-btn.active:not(:first-child)').length > 0) {
+                        allCategoriesBtn.classList.remove('active');
+                    } else {
+                        allCategoriesBtn.classList.add('active');
+                    }
+                }
+            });
+        });
+        
+        // Profile buttons
+        document.getElementById('saved-routes-btn').addEventListener('click', function() {
+            showMyRoutes();
+            document.getElementById('profile-modal').style.display = 'none';
+        });
+        
+        document.getElementById('completed-routes-btn').addEventListener('click', function() {
+            showCompletedRoutes();
+            document.getElementById('profile-modal').style.display = 'none';
+        });
+        
+        function showMyRoutes() {
+            const modal = document.getElementById('recommendations-modal');
+            const modalBody = document.querySelector('.modal-body');
+            const modalTitle = document.querySelector('.modal-title');
+            
+            modalTitle.textContent = 'Сохранённые маршруты';
+            modalBody.innerHTML = `
+                <div class="modal-cards">
+                    ${userRoutes.map(route => `
+                        <div class="modal-card">
+                            <h4 class="modal-card-title">${route.name}</h4>
+                            <div class="modal-card-description">
+                                Дата создания: ${route.date}<br>
+                                Тип: ${route.type}<br>
+                                Мест: ${route.attractions}
+                            </div>
+                            <div class="modal-actions">
+                                <button class="modal-btn modal-btn-accept" style="background: #667eea;">
+                                    Открыть
+                                </button>
+                                <button class="modal-btn modal-btn-reject" style="background: #dc3545;">
+                                    Удалить
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+        
+        function showCompletedRoutes() {
+            const modal = document.getElementById('recommendations-modal');
+            const modalBody = document.querySelector('.modal-body');
+            const modalTitle = document.querySelector('.modal-title');
+            
+            modalTitle.textContent = 'Пройденные маршруты';
+            modalBody.innerHTML = `
+                <div class="modal-cards">
+                    ${completedRoutes.map(route => `
+                        <div class="modal-card">
+                            <h4 class="modal-card-title">${route.name}</h4>
+                            <div class="modal-card-description">
+                                Дата прохождения: ${route.date}<br>
+                                Длительность: ${route.duration}<br>
+                                Мест посещено: ${route.attractions}
+                            </div>
+                            <div class="modal-actions">
+                                <button class="modal-btn modal-btn-accept" style="background: #28a745;">
+                                    Повторить
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+        
+        function showOtherRoutes() {
+            const modal = document.getElementById('recommendations-modal');
+            const modalBody = document.querySelector('.modal-body');
+            const modalTitle = document.querySelector('.modal-title');
+            
+            modalTitle.textContent = 'Маршруты других пользователей';
+            modalBody.innerHTML = `
+                <div class="modal-cards">
+                    ${otherRoutes.map(route => `
+                        <div class="modal-card">
+                            <h4 class="modal-card-title">${route.name}</h4>
+                            <div class="modal-card-description">${route.description}</div>
+                            <div style="font-size: 11px; color: #666; margin-bottom: 10px;">
+                                Длительность: ${route.duration} | Мест: ${route.attractions}
+                            </div>
+                            <div class="modal-actions">
+                                <button class="modal-btn modal-btn-accept" style="background: #667eea;">
+                                    Выбрать
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
